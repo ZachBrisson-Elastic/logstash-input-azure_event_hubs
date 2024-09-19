@@ -377,11 +377,21 @@ azure_event_hubs {
 Adds metadata about the Event Hub, including Event Hub name, consumer_group,
 processor_host, partition, offset, sequence, timestamp, and event_size.  
 
+Please note that @metadata fields are not part of any of your events at output time. If you need these information to be inserted into your original event, you’ll have to use the mutate filter to manually copy the required fields into your event. For example, you can use a mutate filter to add the metadata to the output or process it as needed.
+
 [source,ruby]
 ----
 azure_event_hubs {
    event_hub_connections => ["Endpoint=sb://example1...;EntityPath=event_hub_name1"]
    decorate_events => true
+}
+
+filter {
+  mutate {
+    add_field => {
+      "[azure][metadata]" => "%{[azure][metadata]}"
+    }
+  }
 }
 ----
 
